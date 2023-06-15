@@ -1,88 +1,155 @@
-class State:
-    def __init__(self, label=None):
-        self.label = label
-        self.transitions = []
+import FA
+import DeltaFunction
+
+class N:
+    def __init__(self, start, final):
+        self.startState = start
+        self.finalState = final
+
+class UnfaConvertor:
+    def __init__(self):
+        self.fa = FA.FA()
+        self.NsStack = []
+
+    def regex_to_UNFA(self, regex):
+        postfix = self.infix_to_postfix(regex)
+        print(postfix)
+
+        for token in postfix:
+            print()
+            if token.isalpha() or token.isdigit():
+                print("terminal")
+                self.vtSymbol(token)
+                
+            elif token == "+":
+                print("+ operand")
+                self.plusOperand()
+
+            elif token == "•":
+                print("• operand")
+                self.dotOperand()
+                
+            elif token == "*":
+                print("* operand")
+                self.starOperand()
+            print(self.NsStack)
+
+        if len(self.NsStack) != 1:
+            raise Exception("Invalid regular expression")
+
+        finalN = self.NsStack.pop()
+        self.fa.defStartState(finalN.startState)
+        self.fa.addFinalState(finalN.finalState)
+
+        return self.fa
+
+
+    def infix_to_postfix(self, regex):
+        precedence = {
+            "+": 3,
+            "•": 2,
+            "*": 1,
+            "(": 0
+        }
+        postfix = []
+        stack = []
+
+        for i in range(0, len(regex)):
+            if regex[i].isalpha() or regex[i].isdigit():
+                '''if i+1 < len(regex):
+                    if regex[i+1].isalpha() or regex[i+1].isdigit():
+                        while stack and stack[-1] != "(" and precedence[stack[-1]] < precedence["•"]:
+                            postfix.append(stack.pop())
+                        stack.append("•")
+                        
+                        if postfix[len(postfix) - 1].isalpha() or postfix[len(postfix) - 1].isdigit():
+                            if stack and stack[-1] != "(" and precedence[stack[-1]] == precedence["•"]:
+                                postfix.append(regex[i])
+                                postfix.append(stack.pop())
+                        else: postfix.append(regex[i])
+                    else:
+                        postfix.append(regex[i])
+                else:
+                    postfix.append(regex[i])'''
+                if i-1 > 0:
+                    if (regex[i-1].isalpha() or regex[i-1].isdigit()
+                         or regex[i-1] == "*"):
+                        while stack and stack[-1] != "(" and precedence[stack[-1]] < precedence["•"]:
+                            postfix.append(stack.pop())
+                        postfix.append(regex[i])
+                        postfix.append("•")
+                    else: postfix.append(regex[i])
+                else: postfix.append(regex[i])
+            elif regex[i] == "(":
+                stack.append(regex[i])
+            elif regex[i] == ")":
+                while stack and stack[-1] != "(":
+                    postfix.append(stack.pop())
+                stack.pop()  # Discard "("
+            else:
+                while stack and stack[-1] != "(" and precedence[stack[-1]] <= precedence[regex[i]]:
+                    postfix.append(stack.pop())
+                stack.append(regex[i])
+            print("\ntoken:",regex[i])
+            print("stack:",stack)
+            print("postfix:",postfix)
+
+        while stack:
+            postfix.append(stack.pop())
+
+        return postfix
     
-    def toString(self):
-        rt = "{ " + self.label
-        for t in self.transitions:
-            rt += t
-        rt += " }"
-        return rt
-
-
-def regex_to_UNFA(regex):
-    postfix = infix_to_postfix(regex)
-    print(postfix)
-    stack = []
-
-    for token in postfix:
-        if token.isalpha() or token.isdigit():
-            state = State(token)
-            stack.append(state)
-        elif token == "•":
-            state2 = stack.pop()
-            state1 = stack.pop()
-            new_state = State()
-            new_state.transitions.append((state1, epsilon))
-            new_state.transitions.append((state2, epsilon))
-            stack.append(new_state)
-        elif token == "*":
-            state = stack.pop()
-            new_state = State()
-            new_state.transitions.append((state, epsilon))
-            new_state.transitions.append((new_state, epsilon))
-            stack.append(new_state)
-        
-        stack_content = ""
-        for st in stack:
-            stack_content += st.toString()
-        print(stack_content)
-
-    if len(stack) != 1:
-        raise Exception("Invalid regular expression")
-
-    start_state = stack.pop()
-    final_state = State()  # Create a new final state
-    UNFA = {
-        "start": start_state,
-        "final": final_state
-    }
-
-    return UNFA
-
-
-def infix_to_postfix(regex):
-    precedence = {
-        "+": 3,
-        "•": 2,
-        "*": 1,
-        "(": 0
-    }
-    postfix = []
-    stack = []
-
-    for token in regex:
-        if token.isalpha() or token.isdigit():
-            postfix.append(token)
-        elif token == "(":
-            stack.append(token)
-        elif token == ")":
-            while stack and stack[-1] != "(":
-                postfix.append(stack.pop())
-            stack.pop()  # Discard "("
+    def defDeltaFunc(self, start, symbol, final):
+        isDeltaExist, delta = self.fa.findDeltaFunc(start, symbol)
+        if isDeltaExist:
+            delta = self.fa.addDeltaFuncNextState(start, symbol, final)
         else:
-            while stack and stack[-1] != "(" and precedence[stack[-1]] >= precedence[token]:
-                postfix.append(stack.pop())
-            stack.append(token)
+            delta = DeltaFunction.DeltaFunction(start, symbol, final)
+            self.fa.addDeltaFunc(delta)
 
-    while stack:
-        postfix.append(stack.pop())
+    def vtSymbol(self, token):
+        state1 = self.fa.addState()
+        state2 = self.fa.addState()
 
-    return postfix
+        self.fa.addTerminal(token)
 
+        self.defDeltaFunc(state1, token, state2)
+        
+        self.NsStack.append(N(state1, state2))
+    
+    def plusOperand(self):
+        state1 = self.fa.addState()
+        state2 = self.fa.addState()
 
-# Example usage
-regex = "(a+b)*abb"
-UNFA = regex_to_UNFA(regex)
-print(UNFA)
+        Ns = []
+        Ns.append(self.NsStack.pop())
+        Ns.append(self.NsStack.pop())
+        
+        for n in Ns:
+            self.defDeltaFunc(state1, "ε", n.finalState)
+        
+        for n in Ns:
+            self.defDeltaFunc(n.startState, "ε", state2)
+
+        self.NsStack.append(N(state1, state2))
+
+    def dotOperand(self):
+        n2 = self.NsStack.pop()
+        n1 = self.NsStack.pop()
+        
+        self.defDeltaFunc(n1.finalState, "ε", n2.startState)
+
+        self.NsStack.append(N(n1.startState, n2.finalState))
+    
+    def starOperand(self):
+        state1 = self.fa.addState()
+        state2 = self.fa.addState()
+
+        n = self.NsStack.pop()
+        
+        self.defDeltaFunc(state1, "ε", n.startState)
+        self.defDeltaFunc(state1, "ε", state2)
+        self.defDeltaFunc(n.finalState, "ε", n.startState)
+        self.defDeltaFunc(n.finalState, "ε", state2)
+
+        self.NsStack.append(N(state1, state2))
