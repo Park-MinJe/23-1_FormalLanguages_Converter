@@ -50,11 +50,18 @@ class FA:
 
     # terminal 추가
     def addTerminal(self, vt):
-        for t in self.TerminalSet:
-            if vt == t: continue
-            else: 
+        if len(self.TerminalSet) > 0:
+            isTerminalExist = False
+            for t in self.TerminalSet:
+                if t == vt: 
+                    isTerminalExist = True
+                    break
+                else: 
+                    isTerminalExist = False
+            if not isTerminalExist:
                 self.TerminalSet.append(vt)
-                break
+        else:
+            self.TerminalSet.append(vt)
         
     # delta function 추가
     def addDeltaFunc(self, df):

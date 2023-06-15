@@ -72,15 +72,21 @@ class UnfaConvertor:
                 else:
                     postfix.append(regex[i])'''
                 if i-1 > 0:
-                    if (regex[i-1].isalpha() or regex[i-1].isdigit()
-                         or regex[i-1] == "*"):
+                    if regex[i-1] != "+" and regex[i-1] != "•" and regex[i-1] != "(":
                         while stack and stack[-1] != "(" and precedence[stack[-1]] < precedence["•"]:
                             postfix.append(stack.pop())
-                        postfix.append(regex[i])
-                        postfix.append("•")
-                    else: postfix.append(regex[i])
-                else: postfix.append(regex[i])
+                        if stack and stack[-1] != "(" and precedence[stack[-1]] == precedence["•"]:
+                            postfix.append(stack.pop())
+                        stack.append("•")
+                postfix.append(regex[i])
             elif regex[i] == "(":
+                if i-1 > 0:
+                    if regex[i-1] != "+" and regex[i-1] != "•" and regex[i-1] != "(":
+                        while stack and stack[-1] != "(" and precedence[stack[-1]] < precedence["•"]:
+                            postfix.append(stack.pop())
+                        if stack and stack[-1] != "(" and precedence[stack[-1]] == precedence["•"]:
+                            postfix.append(stack.pop())
+                        stack.append("•")
                 stack.append(regex[i])
             elif regex[i] == ")":
                 while stack and stack[-1] != "(":
@@ -96,6 +102,9 @@ class UnfaConvertor:
 
         while stack:
             postfix.append(stack.pop())
+            print("\ntoken:",regex[i])
+            print("stack:",stack)
+            print("postfix:",postfix)
 
         return postfix
     
