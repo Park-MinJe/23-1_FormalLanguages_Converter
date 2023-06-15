@@ -35,6 +35,10 @@ class FA:
         self.StartState = ""
         self.FinalStateSet = []
 
+    '''
+    setter
+    '''
+
     # state 추가
     def addState(self):
         stateSetLen = len(self.StateSet)
@@ -83,12 +87,30 @@ class FA:
     def addFinalState(self, state):
         self.FinalStateSet.append(state)
 
+    '''
+    getter
+    '''
+
     # delta function 탐색
     def findDeltaFunc(self, preState, symbol):
         for delta in self.DeltaFunctions:
             if delta.preState == preState and delta.symbol == symbol:
                 return True, delta
         return False, None
+    
+    # symbol로 delta function 반환
+    def getDeltaFuncBySymbol(self, symbol):
+        rt = []
+        for df in self.DeltaFunctions:
+            if df.symbol == symbol: rt.append(df)
+        return rt
+    
+    # 입력 받은 symbol 제외 delta function 반환
+    def getDeltaFuncWithoutSymbol(self, symbol):
+        rt = []
+        for df in self.DeltaFunctions:
+            if df.symbol != symbol: rt.append(df)
+        return rt
     
     # print FA as string
     def toString(self):

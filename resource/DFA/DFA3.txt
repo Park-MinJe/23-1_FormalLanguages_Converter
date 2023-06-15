@@ -1,0 +1,8 @@
+StateSet = { q000, q001, q002 }
+TerminalSet = { 1, 0 }
+DeltaFunctions = {
+	(q000, 0) = {q001}
+	(q001, 0) = {q002}
+}
+StartState = q000
+FinalState = { q002 }

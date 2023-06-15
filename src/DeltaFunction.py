@@ -2,7 +2,7 @@ class DeltaFunction:
     def __init__(self, preState, symbol, nextStates):
         self.preState = preState
         self.symbol = symbol
-
+        
         self.nextStates = [nextStates]
 
     def findNextState(self, nextState):
@@ -17,7 +17,7 @@ class DeltaFunction:
     def toString(self):
         rt = "(" + self.preState + ", " + self.symbol + ") = {"
         for i in range(0, len(self.nextStates)):
-            rt += self.nextStates[i]
+            rt += str(self.nextStates[i])
             if i < len(self.nextStates)-1: rt += ", "
             else: rt += "}"
         

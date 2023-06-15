@@ -1,5 +1,5 @@
-import FA
-import DeltaFunction
+from FA import FA
+from DeltaFunction import DeltaFunction
 
 class N:
     def __init__(self, start, final):
@@ -8,43 +8,43 @@ class N:
 
 class UnfaConvertor:
     def __init__(self):
-        self.fa = FA.FA()
+        self.unfa = FA()
         self.NsStack = []
 
-    def regex_to_UNFA(self, regex):
-        postfix = self.infix_to_postfix(regex)
+    def regexToUNFA(self, regex):
+        postfix = self.infixToPostfix(regex)
         print(postfix)
 
         for token in postfix:
-            print()
+            #print()
             if token.isalpha() or token.isdigit():
-                print("terminal")
+                #print("terminal")
                 self.vtSymbol(token)
                 
             elif token == "+":
-                print("+ operand")
+                #print("+ operand")
                 self.plusOperand()
 
             elif token == "•":
-                print("• operand")
+                #print("• operand")
                 self.dotOperand()
                 
             elif token == "*":
-                print("* operand")
+                #print("* operand")
                 self.starOperand()
-            print(self.NsStack)
+            #print(self.NsStack)
 
         if len(self.NsStack) != 1:
             raise Exception("Invalid regular expression")
 
         finalN = self.NsStack.pop()
-        self.fa.defStartState(finalN.startState)
-        self.fa.addFinalState(finalN.finalState)
+        self.unfa.defStartState(finalN.startState)
+        self.unfa.addFinalState(finalN.finalState)
 
-        return self.fa
+        return self.unfa
 
 
-    def infix_to_postfix(self, regex):
+    def infixToPostfix(self, regex):
         precedence = {
             "+": 3,
             "•": 2,
@@ -56,21 +56,6 @@ class UnfaConvertor:
 
         for i in range(0, len(regex)):
             if regex[i].isalpha() or regex[i].isdigit():
-                '''if i+1 < len(regex):
-                    if regex[i+1].isalpha() or regex[i+1].isdigit():
-                        while stack and stack[-1] != "(" and precedence[stack[-1]] < precedence["•"]:
-                            postfix.append(stack.pop())
-                        stack.append("•")
-                        
-                        if postfix[len(postfix) - 1].isalpha() or postfix[len(postfix) - 1].isdigit():
-                            if stack and stack[-1] != "(" and precedence[stack[-1]] == precedence["•"]:
-                                postfix.append(regex[i])
-                                postfix.append(stack.pop())
-                        else: postfix.append(regex[i])
-                    else:
-                        postfix.append(regex[i])
-                else:
-                    postfix.append(regex[i])'''
                 if i-1 > 0:
                     if regex[i-1] != "+" and regex[i-1] != "•" and regex[i-1] != "(":
                         while stack and stack[-1] != "(" and precedence[stack[-1]] < precedence["•"]:
@@ -109,26 +94,26 @@ class UnfaConvertor:
         return postfix
     
     def defDeltaFunc(self, start, symbol, final):
-        isDeltaExist, delta = self.fa.findDeltaFunc(start, symbol)
+        isDeltaExist, delta = self.unfa.findDeltaFunc(start, symbol)
         if isDeltaExist:
-            delta = self.fa.addDeltaFuncNextState(start, symbol, final)
+            delta = self.unfa.addDeltaFuncNextState(start, symbol, final)
         else:
-            delta = DeltaFunction.DeltaFunction(start, symbol, final)
-            self.fa.addDeltaFunc(delta)
+            delta = DeltaFunction(start, symbol, final)
+            self.unfa.addDeltaFunc(delta)
 
     def vtSymbol(self, token):
-        state1 = self.fa.addState()
-        state2 = self.fa.addState()
+        state1 = self.unfa.addState()
+        state2 = self.unfa.addState()
 
-        self.fa.addTerminal(token)
+        self.unfa.addTerminal(token)
 
         self.defDeltaFunc(state1, token, state2)
         
         self.NsStack.append(N(state1, state2))
     
     def plusOperand(self):
-        state1 = self.fa.addState()
-        state2 = self.fa.addState()
+        state1 = self.unfa.addState()
+        state2 = self.unfa.addState()
 
         Ns = []
         Ns.append(self.NsStack.pop())
@@ -151,8 +136,8 @@ class UnfaConvertor:
         self.NsStack.append(N(n1.startState, n2.finalState))
     
     def starOperand(self):
-        state1 = self.fa.addState()
-        state2 = self.fa.addState()
+        state1 = self.unfa.addState()
+        state2 = self.unfa.addState()
 
         n = self.NsStack.pop()
         
