@@ -1,4 +1,20 @@
 class uClosure:
+    '''
+    ε-CLOSURE에 대한 정의이다.
+
+    * data
+        - state: CLOSURE 연산을 시작할 때의 상태
+        - symbol: CLOSURE 연산을 위한 input symbol
+        - visitStates: ε을 input symbol로 하여 접근 가능한 상태 집합
+
+    * functions
+        - addSymbol(start): ε-CLOSURE 탐색 과정에서 사용된 input symbol 원소로 추가.
+        - addSymbolAsArr(start): ε-CLOSURE 탐색 과정에서 사용된 input symbol 배열로 추가. 
+        - addvisitStates(final): ε을 input symbol로 하여 접근 가능한 상태 집합에 원소 추가.
+        - findSymbol(symbol): Input symbol이 존재하는지 확인
+        - findVisited(state): 현재 상태를 입력 받아 ε을 input symbol로 하여 접근 가능한 상태 집합을 반환.
+        - toString(): 구조를 문자열로 출력.
+    '''
     def __init__(self):
         self.state = ""
         self.symbol = []

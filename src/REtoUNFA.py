@@ -7,6 +7,22 @@ class N:
         self.finalState = final
 
 class UnfaConvertor:
+    '''
+    ε-NFA로의 변환기
+
+    * data
+        - unfa: 출력할 ε-NFA
+        - NsStack: 변환 과정에서 연산자의 operand를 왼쪽 끝 상태와 오른쪽 끝 상태를 이용해 다이어그램의 일부를 표현하는 부분.
+
+    * functions
+        - regexToUNFA(regex): 정규표현을 ε-NFA로 변환
+        - infixToPostfix(regex): infix 형식의 입력을 post-fix 양식으로 변환
+        - defDeltaFunc(start, symbol, final): 상태 전개에 사용되는 delta function을 정의
+        - vtSymbol(token): Terminal symbol 정의
+        - plusOperand(): 연산자 '+'에 대한 ε-NFA로 변환
+        - dotOperand(): 연산자 '•'에 대한 ε-NFA로 변환
+        - starOperand(): 연산자 '*'에 대한 ε-NFA로 변환
+    '''
     def __init__(self):
         self.unfa = FA()
         self.NsStack = []
@@ -120,10 +136,10 @@ class UnfaConvertor:
         Ns.append(self.NsStack.pop())
         
         for n in Ns:
-            self.defDeltaFunc(state1, "ε", n.finalState)
+            self.defDeltaFunc(state1, "ε", n.startState)
         
         for n in Ns:
-            self.defDeltaFunc(n.startState, "ε", state2)
+            self.defDeltaFunc(n.finalState, "ε", state2)
 
         self.NsStack.append(N(state1, state2))
 

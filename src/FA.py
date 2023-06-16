@@ -69,7 +69,21 @@ class FA:
         
     # delta function 추가
     def addDeltaFunc(self, df):
-        self.DeltaFunctions.append(df)
+        if len(self.DeltaFunctions) > 0:
+            isDeltaExist = False
+            for d in self.DeltaFunctions:
+                if df.preState == d.preState and df.symbol == d.symbol and df.nextStates == d.nextStates:
+                    isDeltaExist = True
+                    break
+                else:
+                    isDeltaExist = False
+            if not isDeltaExist:
+                self.DeltaFunctions.append(df)
+            else:
+                for ns in df.nextStates:
+                    self.addDeltaFuncNextState(df.preState, df.symbol, ns)
+        else:
+            self.DeltaFunctions.append(df)
     
     # delta function의 next state 추가
     def addDeltaFuncNextState(self, preState, symbol, nextState):

@@ -1,6 +1,20 @@
-StateSet = { q000 }
+StateSet = { q000, q001, q002, q003, q004, q005, q006 }
 TerminalSet = { b, a }
 DeltaFunctions = {
+	(q000, b) = {q001}
+	(q000, a) = {q002}
+	(q002, b) = {q003}
+	(q002, a) = {q004}
+	(q004, b) = {q005}
+	(q004, a) = {q006}
+	(q006, b) = {q005}
+	(q006, a) = {q006}
+	(q005, b) = {q003}
+	(q005, a) = {q004}
+	(q003, b) = {q001}
+	(q003, a) = {q002}
+	(q001, b) = {q001}
+	(q001, a) = {q002}
 }
 StartState = q000
-FinalState = { q000 }
+FinalState = { q000, q001, q003 }
