@@ -10,7 +10,7 @@ class DfaConvertor:
         self.nonUpsilonDeltaFuncs = unfa.getDeltaFuncWithoutSymbol("ε")
 
         self.dfa = FA()
-        self.dfa.TerminalSet = unfa.TerminalSet
+        #self.dfa.TerminalSet = unfa.TerminalSet
 
     def unfaToDfa(self):
         
@@ -55,6 +55,7 @@ class DfaConvertor:
                         uClosureStack.append(newClosure)
                         uClosureRepo.append(newClosure)
 
+                        self.dfa.addTerminal(vt)
                         self.dfa.addDeltaFunc(DeltaFunction(closure.state, vt, newClosure.state))
             
             # 생성된 입실론 closure 출력

@@ -118,13 +118,13 @@ class FA:
         for i in range(0, len(self.StateSet)):
             rt += self.StateSet[i]
             if i < len(self.StateSet)-1: rt += ", "
-            else: rt += " }\n"
+        rt += " }\n"
 
         rt += "TerminalSet = { "
         for i in range(0, len(self.TerminalSet)):
             rt += self.TerminalSet[i]
             if i < len(self.TerminalSet)-1: rt += ", "
-            else: rt += " }\n"
+        rt += " }\n"
 
         rt += "DeltaFunctions = {\n"
         for df in self.DeltaFunctions:
@@ -137,7 +137,7 @@ class FA:
         for i in range(0, len(self.FinalStateSet)):
             rt += self.FinalStateSet[i]
             if i < len(self.FinalStateSet)-1: rt += ", "
-            else: rt += " }\n"
+        rt += " }\n"
 
         return rt
 

@@ -1,8 +1,9 @@
 import FA
 import REtoUNFA
 import UNFAtoDFA
+import DFAtoReducedDFA
 
-
+'''
 exampleRE = open("resource/example_re.txt", 'r', encoding="UTF-8")
 
 i = 0
@@ -44,7 +45,7 @@ arr = [
     "(0+1)*011"
 ]
 
-regex = arr[4]
+regex = arr[3]
 unfaConv = REtoUNFA.UnfaConvertor()
 UNFA = unfaConv.regexToUNFA(regex)
 print(UNFA.toString())
@@ -52,4 +53,7 @@ print(UNFA.toString())
 dfaConvertor = UNFAtoDFA.DfaConvertor(UNFA)
 dfa = dfaConvertor.unfaToDfa()
 print(dfa.toString())
-'''
+
+rdfaConv = DFAtoReducedDFA.ReducedDfaConvertor(dfa)
+rdfa = rdfaConv.dfaToReducedDfa()
+#print(rdfa.toString())
